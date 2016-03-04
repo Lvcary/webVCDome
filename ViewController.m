@@ -70,8 +70,13 @@
         default:
             break;
     }
+    
+//    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 80, 25)];
+//    view.backgroundColor = [UIColor orangeColor];
+//    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:self action:nil];
     [self.navigationController pushViewController:webvc animated:YES];
     
 }
+
 
 @end

@@ -19,6 +19,10 @@
 @property (nonatomic,weak) UIWebView *webView;
 @property (strong, nonatomic) NJKWebViewProgressView *progressView;
 @property (strong, nonatomic) NJKWebViewProgress *progressProxy;
+
+@property (nonatomic, strong) UIButton *backButon;  //返回
+@property (nonatomic, strong) UIButton *closeButton;  //关闭
+
 @end
 
 @implementation webViewController
@@ -26,6 +30,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    
     
     UIWebView *web = [[UIWebView alloc] initWithFrame:CGRectMake(0, 64, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - 64)];
     web.scalesPageToFit = YES;
@@ -60,7 +66,10 @@
         [self.webView bringSubviewToFront:self.webView.scrollView];
     }
     
+    [self setLeftItem];
     [self setRightItem];
+    
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -74,6 +83,48 @@
     [super viewWillDisappear:animated];
     [self.webView stopLoading];
     [_progressView removeFromSuperview];
+}
+
+- (void)backItemAction:(id)sender{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)setLeftItem{
+    if ([_webView canGoBack]) {
+        UIBarButtonItem * backItem = [[UIBarButtonItem alloc] initWithCustomView:self.backButon];
+        UIBarButtonItem * closeItem = [[UIBarButtonItem alloc] initWithCustomView:self.closeButton];
+        self.navigationItem.leftBarButtonItems = [NSArray arrayWithObjects:backItem,closeItem, nil];
+    }else{
+        UIBarButtonItem * backItem = [[UIBarButtonItem alloc] initWithCustomView:self.backButon];
+        
+        self.navigationItem.leftBarButtonItems = [NSArray arrayWithObjects:backItem, nil];
+    }
+}
+
+- (UIButton *)backButon{
+    if (!_backButon) {
+        _backButon = [UIButton buttonWithType:UIButtonTypeSystem];
+        _backButon.frame = CGRectMake(0, 0, 45, 30);
+        [_backButon setImage:[UIImage imageNamed:@"arrow_nav"] forState:0];
+        [_backButon setTitle:@"返回" forState:0];
+        
+        [_backButon setTitleEdgeInsets:UIEdgeInsetsMake(5, -15, 5, 0)];
+        [_backButon setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 33)];
+        
+        [_backButon addTarget:self action:@selector(backBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _backButon;
+}
+
+- (UIButton *)closeButton{
+    if (!_closeButton) {
+        _closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        _closeButton.frame = CGRectMake(0, 0, 35, 25);
+        [_closeButton setTitle:@"关闭" forState:0];
+        
+        [_closeButton addTarget:self action:@selector(closeBtnActon:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _closeButton;
 }
 
 - (void)setRightItem{
@@ -109,6 +160,9 @@
 
 }
 
+
+
+#pragma mark ---Action---
 - (void)shareAction:(id)sender{
     NSArray *array = [NSArray arrayWithObjects:@"新浪微博",@"朋友圈",@"QQ空间",@"邮件", nil];
     NSArray *arrayImage = [NSArray arrayWithObjects:@"sina_on@2x",@"wechat_icon@2x",@"qzone_on@2x",@"email_on@2x", nil];
@@ -132,6 +186,18 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+- (void)backBtnAction:(UIButton *)sender{
+    if ([_webView canGoBack]) {
+        [_webView goBack];
+    }else{
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+- (void)closeBtnActon:(UIButton *)sender{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 #pragma mark  ----webvieDelegate---
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
@@ -139,6 +205,7 @@
 }
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
+    [self setLeftItem];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
